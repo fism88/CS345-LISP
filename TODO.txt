@@ -1,0 +1,18 @@
+[ ] Add subract function
+[ ] Add multiplication function
+[ ] Add divide function
+[ ] Add function to test if a list is empty
+[ ] foldr preloaded like car/cdr/cons
+[ ] combinators preloaded like car/cdr/cons
+[ ] Add error handling for:
+    syntax errors
+    type mismatches
+    wrong number of arguments to a function
+[ ] Add flag to toggle between static or dynamic scoping.
+    It'd be nice if this was a command line argument
+    Like: "java Parser -d" or "java Parser --dynamic" for dynamic scoping.
+[ ] It'd also be nice if we had flags for toggling between different kinds
+    of output. Like...maybe a TRACE flag to show each step of execution,
+    and maybe a DEBUG flag for more verbose output.
+[ ] It'd be nice if we wrote debug output to a log file, since it's
+    hard to view just printing to stdout.

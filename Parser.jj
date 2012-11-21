@@ -1,0 +1,322 @@
+PARSER_BEGIN(Parser)
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedHashMap;
+
+public class Parser {
+  
+  static class Pair<A, B> {
+    final A v1;
+    final B v2;
+
+    public Pair(A v1, B v2) {
+      this.v1 = v1;
+      this.v2 = v2;
+    }
+
+    public String toString() {
+      return "(" + this.v1 + ", " + this.v2 + ")";
+    }
+  }
+
+  public static void main(String args[]) throws ParseException {
+    Parser parser = new Parser (System.in);
+    parser.prog();
+  }
+}
+
+PARSER_END(Parser)
+
+SKIP:
+{
+    " "
+  | "\t"
+  | "\n"
+  | "\r"
+  | <"%" (~["\n","\r"])* ("\n"|"\r")>
+}
+
+TOKEN:
+{
+    < NIL : ["N","n"] ["I","i"] ["L","l"] >
+}
+
+TOKEN:
+{
+    < LPAR : "(" >
+  | < RPAR : ")" >
+  | < INTEGER : (["0"-"9"])+ | "-" (["0"-"9"])+ >
+  | < DOUBLE : (["0"-"9"])+"."(["0"-"9"])+ | "-" (["0"-"9"])+"."(["0"-"9"])+ >
+  | < LET : "let">
+  | < LETREC : "let-rec" >
+  | < LAMBDA : "lambda" >
+  | < LIST : "list" >
+  | < CAR : "car" >
+  | < CDR : "cdr" >
+  | < CONS : "cons" >
+  | < IF : "if" >
+  | < EQUALS : "=" >
+  | < PLUS : "+" >
+  | < SYMBOL : ["a"-"z", "A"-"Z", "~", "`", "!", "@", "#", "$", "/", "^", "&",
+                "*", "_", "-", "=", "+", "{", "}", "[", "]", "|", "\\", ":",
+                ";", "<", ">", ",", ".", "?", "'", "\""](["a"-"z", "A"-"Z",
+                "0"-"9", "~", "`", "!", "@", "#", "$", "/", "^", "&", "*", "_",
+                "-", "=", "+", "{", "}", "[", "]", "|", "\\", ":", ";", "<",
+                ">", ",", ".", "?", "'", "\""])* >
+}
+
+TOKEN:
+{
+  < ERROR : ~[] >
+}
+
+
+ASTNode atom():
+{ Token n; String l; }
+{
+  //  n = <NIL>     { return n.image; }
+    n = <INTEGER> { return new ASTNode.NumNode(n.image); }
+  | n = <DOUBLE> { return new ASTNode.NumNode(n.image); }
+  | n = <SYMBOL>  { return new ASTNode.IdNode(n.image); }
+}
+
+ASTNode equals():
+{
+  ASTNode exprOne, exprTwo;    
+}
+{
+  <EQUALS>
+  exprOne = expr()
+  exprTwo = expr()
+
+  { return new ASTNode.EqualsNode(exprOne, exprTwo); }
+}
+
+ASTNode add():
+{
+  Token t;
+  ASTNode lhs, rhs;
+}
+{
+  <PLUS>
+  lhs = expr()
+  rhs = expr()
+
+  { return new ASTNode.AddNode(lhs, rhs); }
+}
+
+ASTNode car():
+{
+  ASTNode list;
+}
+{
+  <CAR>
+  list = expr()
+  
+  { return new ASTNode.CarNode(list); }
+}
+ASTNode cdr():
+{
+  ASTNode list;
+}
+{
+  <CDR>
+  list = expr()
+  
+  { return new ASTNode.CdrNode(list); }
+}
+
+ASTNode cons():
+{
+  ASTNode arg, list;
+}
+{
+  <CONS>
+  arg = expr()
+  list = expr()
+
+  { return new ASTNode.ConsNode(arg, list); }
+}
+
+ASTNode list():
+{
+  ArrayList<ASTNode> elements = new ArrayList<ASTNode>();
+  ASTNode tmp;
+}
+{
+  <LIST>
+  (
+    tmp = expr() { elements.add(tmp); }
+  )*
+
+  { return new ASTNode.ListNode(elements); }
+
+}
+
+ASTNode function_app():
+{
+  ASTNode identifier, element;
+  ArrayList<ASTNode> args = new ArrayList<ASTNode>();
+}
+{
+  identifier = expr()
+  (
+    element = expr() { args.add(element); }
+  )*
+
+  { return new ASTNode.AppNode(identifier, args); }
+  
+
+}
+
+ASTNode lambda():
+{ 
+  Token n;
+  ASTNode param, body;
+  ArrayList<ASTNode> params = new ArrayList<ASTNode>();
+}
+{
+  <LAMBDA>
+  <LPAR>
+  (
+  n = <SYMBOL> { params.add(new ASTNode.SymbolNode(n.image)); } 
+  )*
+  <RPAR>
+  body = expr()
+
+  { return new ASTNode.FunNode(body, params); }
+}
+
+ASTNode conditional():
+{
+  ASTNode conditional, exprOne, exprTwo;
+}
+{
+  <IF>
+  conditional = expr()
+  exprOne = expr()
+  exprTwo = expr()
+
+  { return new ASTNode.IfNode(conditional, exprOne, exprTwo); }
+}
+
+
+ArrayList let_binding_instances():
+{ 
+  ArrayList map = new ArrayList<Pair>();
+  Token a_token;
+  ASTNode a_node, b;
+}
+{
+  (
+  <LPAR>
+  a_token = <SYMBOL> { a_node = new ASTNode.IdNode(a_token.image); }
+  b = expr()
+  <RPAR>
+
+  { map.add(new Pair<ASTNode, ASTNode>(a_node, b)); }
+  )*
+
+  { 
+  //  System.out.println("in let_bind...(): map=" + map); 
+
+    return map; 
+  }
+}
+
+ASTNode letrec():
+{
+  Token a_token;
+  ASTNode body;
+  ArrayList<Pair<ASTNode, ASTNode>> bindings;
+}
+{
+  <LETREC>
+  <LPAR>
+  bindings = let_binding_instances()
+  <RPAR>
+  // C
+  body = expr()
+
+  {
+    ArrayList arg_symbols = new ArrayList(bindings.size());
+    ArrayList values = new ArrayList(bindings.size());
+
+    for (Pair p: bindings) {
+      arg_symbols.add(p.v1);
+      values.add(p.v2);
+    }
+
+    return new ASTNode.AppRecNode(arg_symbols, body, values);
+  }
+}
+
+ASTNode let():
+{
+  Token a_token;
+  ASTNode body;
+  ArrayList<Pair<ASTNode, ASTNode>> bindings;
+}
+{
+  <LET>
+  <LPAR>
+  bindings = let_binding_instances()
+  <RPAR>
+  // C
+  body = expr()
+
+  {
+    ArrayList arg_symbols = new ArrayList(bindings.size());
+    ArrayList values = new ArrayList(bindings.size());
+
+    for (Pair p: bindings) {
+      arg_symbols.add(p.v1);
+      values.add(p.v2);
+    }
+
+    return new ASTNode.AppNode(arg_symbols, body, values);
+  }
+}
+
+ASTNode expr():
+{
+  ASTNode expr;
+}
+{ 
+    expr = atom() { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = let() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = letrec() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = lambda() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = list() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = car() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = cdr() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = cons() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = conditional() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = equals() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = add() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = function_app() <RPAR> ) { return expr; }
+
+}
+
+void prog():
+{
+  ASTNode s;
+  PrintVisitor v = new PrintVisitor();
+  Interpreter interp;
+}
+{
+  (
+    s = expr() 
+    {  
+      System.out.println("-------------------------------");
+      s.accept(v);
+
+      interp = new Interpreter();
+
+      s.accept(interp);
+      System.out.println(interp.env);
+
+    } 
+  )*
+}

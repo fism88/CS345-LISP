@@ -1,0 +1,7 @@
+1
+(lambda (x) 3)
+(lambda (x) x)
+(let ((x 4)) 5)
+(let ((x 6)) x)
+(let ((f (lambda (x) x))) (f 7))
+(let ((x 3)) (let ((f (lambda (y) (+ x y)))) (f 4)))
