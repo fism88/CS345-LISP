@@ -1,6 +1,6 @@
-[ ] Add subract function
-[ ] Add multiplication function
-[ ] Add divide function
+[X] Add subract function
+[X] Add multiplication function
+[X] Add divide function
 [ ] Add function to test if a list is empty
 [ ] foldr preloaded like car/cdr/cons
 [ ] combinators preloaded like car/cdr/cons
