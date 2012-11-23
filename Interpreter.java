@@ -61,6 +61,9 @@ public class Interpreter extends Visitor {
     else if (node instanceof ASTNode.AddNode) {
       return this.visitAddNode(node);
     } 
+    else if (node instanceof ASTNode.SubNode) {
+      return this.visitSubNode(node);
+    }
     else if (node instanceof ASTNode.CarNode) {
       return this.visitCarNode(node);
     } 
@@ -195,6 +198,14 @@ public class Interpreter extends Visitor {
 
     // add args and return result
     return new EnvValue.Num(arg1.value + arg2.value);
+  }
+
+  private EnvValue visitSubNode(ASTNode node) {
+    System.out.println("Saw SubNode");
+    EnvValue.Num arg1 = (EnvValue.Num) this.eval_visit(node.children.get(0));
+    EnvValue.Num arg2 = (EnvValue.Num) this.eval_visit(node.children.get(1));
+
+    return new EnvValue.Num(arg1.value - arg2.value);
   }
 
   private EnvValue visitCarNode(ASTNode node) {

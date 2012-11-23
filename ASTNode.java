@@ -10,6 +10,7 @@ public class ASTNode {
   static final String SYMBOL = "'";
   static final String LIST = "list";
   static final String ADD = "add";
+  static final String SUB = "sub";
   static final String CAR = "car";
   static final String CDR = "cdr";
   static final String CONS = "cons";
@@ -210,4 +211,11 @@ public class ASTNode {
     }
   }
 
+  public static class SubNode extends ASTNode {
+    public SubNode(ASTNode lhs, ASTNode rhs) {
+      super(ASTNode.SUB, null);
+      this.AddChild(lhs);
+      this.AddChild(rhs);
+    }
+  }
 }

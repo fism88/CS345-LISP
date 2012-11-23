@@ -58,6 +58,7 @@ TOKEN:
   | < IF : "if" >
   | < EQUALS : "=" >
   | < PLUS : "+" >
+  | < SUB : "-" >
   | < SYMBOL : ["a"-"z", "A"-"Z", "~", "`", "!", "@", "#", "$", "/", "^", "&",
                 "*", "_", "-", "=", "+", "{", "}", "[", "]", "|", "\\", ":",
                 ";", "<", ">", ",", ".", "?", "'", "\""](["a"-"z", "A"-"Z",
@@ -104,6 +105,19 @@ ASTNode add():
   rhs = expr()
 
   { return new ASTNode.AddNode(lhs, rhs); }
+}
+
+ASTNode sub():
+{
+  Token t;
+  ASTNode lhs, rhs;
+}
+{
+  <SUB>
+  lhs = expr()
+  rhs = expr()
+
+  { return new ASTNode.SubNode(lhs, rhs); }
 }
 
 ASTNode car():
@@ -295,6 +309,7 @@ ASTNode expr():
   | LOOKAHEAD(2) ( <LPAR> expr = conditional() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = equals() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = add() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = sub() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = function_app() <RPAR> ) { return expr; }
 
 }
