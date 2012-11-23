@@ -11,6 +11,8 @@ public class ASTNode {
   static final String LIST = "list";
   static final String ADD = "add";
   static final String SUB = "sub";
+  static final String MULT = "mult";
+  static final String DIV = "div";
   static final String CAR = "car";
   static final String CDR = "cdr";
   static final String CONS = "cons";
@@ -214,6 +216,22 @@ public class ASTNode {
   public static class SubNode extends ASTNode {
     public SubNode(ASTNode lhs, ASTNode rhs) {
       super(ASTNode.SUB, null);
+      this.AddChild(lhs);
+      this.AddChild(rhs);
+    }
+  }
+
+  public static class MultNode extends ASTNode {
+    public MultNode(ASTNode lhs, ASTNode rhs) {
+      super(ASTNode.MULT, null);
+      this.AddChild(lhs);
+      this.AddChild(rhs);
+    }
+  }
+
+  public static class DivNode extends ASTNode {
+    public DivNode(ASTNode lhs, ASTNode rhs) {
+      super(ASTNode.DIV, null);
       this.AddChild(lhs);
       this.AddChild(rhs);
     }

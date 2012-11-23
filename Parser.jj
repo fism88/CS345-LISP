@@ -59,6 +59,8 @@ TOKEN:
   | < EQUALS : "=" >
   | < PLUS : "+" >
   | < SUB : "-" >
+  | < MULT : "*" >
+  | < DIV : "/" >
   | < SYMBOL : ["a"-"z", "A"-"Z", "~", "`", "!", "@", "#", "$", "/", "^", "&",
                 "*", "_", "-", "=", "+", "{", "}", "[", "]", "|", "\\", ":",
                 ";", "<", ">", ",", ".", "?", "'", "\""](["a"-"z", "A"-"Z",
@@ -118,6 +120,32 @@ ASTNode sub():
   rhs = expr()
 
   { return new ASTNode.SubNode(lhs, rhs); }
+}
+
+ASTNode mult():
+{
+  Token t;
+  ASTNode lhs, rhs;
+}
+{
+  <MULT>
+  lhs = expr()
+  rhs = expr()
+
+  { return new ASTNode.MultNode(lhs, rhs); }
+}
+
+ASTNode div():
+{
+  Token t;
+  ASTNode lhs, rhs;
+}
+{
+  <DIV>
+  lhs = expr()
+  rhs = expr()
+
+  { return new ASTNode.DivNode(lhs, rhs); }
 }
 
 ASTNode car():
@@ -310,6 +338,8 @@ ASTNode expr():
   | LOOKAHEAD(2) ( <LPAR> expr = equals() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = add() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = sub() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = mult() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = div() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = function_app() <RPAR> ) { return expr; }
 
 }

@@ -5,4 +5,7 @@
 (let ((x 6)) x)
 (let ((f (lambda (x) x))) (f 7))
 (- 5 4)
+(* 5 2)
+(/ 4 2)
+(/ 5 3)
 (let ((x 3)) (let ((f (lambda (y) (+ x y)))) (f 4)))
