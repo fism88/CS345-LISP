@@ -55,6 +55,7 @@ TOKEN:
   | < CAR : "car" >
   | < CDR : "cdr" >
   | < CONS : "cons" >
+  | < FOLDR : "foldr" >
   | < IF : "if" >
   | < EQUALS : "=" >
   | < PLUS : "+" >
@@ -179,6 +180,18 @@ ASTNode cons():
   list = expr()
 
   { return new ASTNode.ConsNode(arg, list); }
+}
+
+ASTNode foldr():
+{
+  ASTNode arg, list;
+}
+{
+  <FOLDR>
+  arg = expr();
+  list = expr();
+
+  { return new ASTNode.FoldrNode(arg, list); }
 }
 
 ASTNode list():
@@ -334,6 +347,7 @@ ASTNode expr():
   | LOOKAHEAD(2) ( <LPAR> expr = car() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = cdr() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = cons() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = foldr() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = conditional() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = equals() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = add() <RPAR> ) { return expr; }

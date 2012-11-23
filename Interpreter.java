@@ -79,6 +79,9 @@ public class Interpreter extends Visitor {
     else if (node instanceof ASTNode.ConsNode) {
       return this.visitConsNode(node);
     }
+    else if (node instaceof ASTNode.FoldrNode) {
+      return this.visitFoldrNode(node);
+    }
     else if (node instanceof ASTNode.IfNode) {
       return this.visitIfNode(node);
     }
@@ -242,6 +245,11 @@ public class Interpreter extends Visitor {
   
   private EnvValue visitConsNode(ASTNode node) {
     System.out.println("Saw ConsNode");
+    return this.eval_visit(node.execute());
+  }
+
+  private EnvValue visitFoldrNode(ASTNode node) {
+    System.out.println("Saw FoldrNode");
     return this.eval_visit(node.execute());
   }
 

@@ -16,6 +16,7 @@ public class ASTNode {
   static final String CAR = "car";
   static final String CDR = "cdr";
   static final String CONS = "cons";
+  static final String FOLDR = "foldr";
   static final String IF = "if";
   static final String EQUALS = "equals";
 
@@ -176,6 +177,18 @@ public class ASTNode {
       }
 
       return new ASTNode.ListNode(result);
+    }
+  }
+
+  public static class FoldrNode extends ASTNode {
+    public FoldrNode(ASTNode arg, ASTNode list) {
+      super(ASTNode.FOLDR, null);
+      this.children.add(arg);
+      this.children.add(list);
+    }
+
+    public ASTNode execute() {
+      return null;
     }
   }
 
