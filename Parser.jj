@@ -1,11 +1,15 @@
 PARSER_BEGIN(Parser)
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedHashMap;
 
 public class Parser {
   
+  public static boolean DEBUGGING = false;
+  public static final String[] DEBUG_FLAGS = {"-d", "--debug"};
+
   static class Pair<A, B> {
     final A v1;
     final B v2;
@@ -20,7 +24,19 @@ public class Parser {
     }
   }
 
+  private static void parseFlags(String[] args) {
+    System.out.println(Arrays.toString(args));
+    for (int i = 0; i < args.length; i++) {
+      for (String flag: DEBUG_FLAGS) {
+        if (args[i].equals(flag))
+          DEBUGGING = true;
+      }   
+    }
+  }
+
   public static void main(String args[]) throws ParseException {
+    parseFlags(args);
+
     Parser parser = new Parser (System.in);
     parser.prog();
   }
@@ -78,7 +94,6 @@ TOKEN:
 ASTNode atom():
 { Token n; String l; }
 {
-  //  n = <NIL>     { return n.image; }
     n = <INTEGER> { return new ASTNode.NumNode(n.image); }
   | n = <DOUBLE> { return new ASTNode.NumNode(n.image); }
   | n = <SYMBOL>  { return new ASTNode.IdNode(n.image); }
@@ -261,8 +276,6 @@ ArrayList let_binding_instances():
   )*
 
   { 
-  //  System.out.println("in let_bind...(): map=" + map); 
-
     return map; 
   }
 }
@@ -278,7 +291,6 @@ ASTNode letrec():
   <LPAR>
   bindings = let_binding_instances()
   <RPAR>
-  // C
   body = expr()
 
   {
@@ -305,7 +317,6 @@ ASTNode let():
   <LPAR>
   bindings = let_binding_instances()
   <RPAR>
-  // C
   body = expr()
 
   {

@@ -110,12 +110,6 @@ public class ASTNode {
   }
  
   public static class AppRecNode extends ASTNode {
- //   public AppRecNode(ASTNode arg_symbol, ArrayList<ASTNode> values) {
- //     super(ASTNode.APP, null);
- //     this.AddChild(arg_symbol);
- //     this.AddChild(new ASTNode.ListNode(values));
- //   }
-
     public AppRecNode(ArrayList<ASTNode> arg_symbols, ASTNode body, ArrayList<ASTNode> values) {
       super(ASTNode.APPREC, null);
       this.AddChild(new ASTNode.ListNode(arg_symbols));
@@ -186,14 +180,6 @@ public class ASTNode {
       this.children.add(exprOne);
       this.children.add(exprTwo);
     }
-
-    public ASTNode execute() {
-      // maybe here? 
-      // evaluate conditional
-      // if true return exprOne
-      // else return exprTwo
-      return null;
-    }
   }
 
   public static class EqualsNode extends ASTNode {
@@ -202,7 +188,6 @@ public class ASTNode {
       this.children.add(exprOne);
       this.children.add(exprTwo);
     }
-
   }
 
   public static class AddNode extends ASTNode {
