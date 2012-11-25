@@ -181,7 +181,7 @@ public class ASTNode {
   }
 
   public static class FoldrNode extends ASTNode {
-    public FoldrNode(ASTNode arg, ASTNode list) {
+    public FoldrNode(ASTNode fun, ASTNode arg, ASTNode list) {
       super(ASTNode.FOLDR, null);
       this.children.add(arg);
       this.children.add(list);
