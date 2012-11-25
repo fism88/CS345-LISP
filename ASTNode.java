@@ -177,12 +177,14 @@ public class ASTNode {
   public static class FoldrNode extends ASTNode {
     public FoldrNode(ASTNode fun, ASTNode arg, ASTNode list) {
       super(ASTNode.FOLDR, null);
+      this.children.add(fun);
       this.children.add(arg);
       this.children.add(list);
     }
 
     public ASTNode execute() {
-      return null;
+      if (this.children.get(2).children == null)
+        return new ASTNode.ListNode(this.children.get(1));
     }
   }
 
