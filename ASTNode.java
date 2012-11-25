@@ -185,6 +185,10 @@ public class ASTNode {
     public ASTNode execute() {
       if (this.children.get(2).children == null)
         return new ASTNode.ListNode(this.children.get(1));
+      else {
+        return new ASTNode.ListNode(this.children.get(0), new ASTNode.CarNode(this.children.get(2)), 
+		    new ASTNode.FoldrNode(this.children.get(0), this.children.get(1), new ASTNode.CdrNode(this.children.get(2))));
+      }
     }
   }
 
