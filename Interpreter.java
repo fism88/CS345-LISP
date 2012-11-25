@@ -93,15 +93,9 @@ public class Interpreter extends Visitor {
 
     // function application: (f 1 2 ...)
     if (node.children.size() == 2) {
-      String fun_id = node.children.get(0).value;
-      EnvValue.Closure closure = (EnvValue.Closure) env.get(fun_id);
+      EnvValue.Closure closure = (EnvValue.Closure) this.eval_visit(node.children.get(0)); 
 
       EnvValue.List args = (EnvValue.List) this.eval_visit(node.children.get(1));
-
-      if (Parser.DEBUGGING) {
-        System.out.println(" fun_id= " + fun_id);
-        System.out.println(" closure= " + closure);
-      }
 
       return closure.eval(args);
     }
