@@ -71,11 +71,12 @@ public class EnvValue {
     }
     
     public EnvValue eval(EnvValue.List args) {
-      System.out.println("in closure.eval(1)");
-      System.out.println("  " + this.toString());
-      System.out.println(this.env);
+      if (Parser.DEBUGGING) {
+        System.out.println("in closure.eval(1)");
+        System.out.println("  " + this.toString());
+        System.out.println("  closure.env= " + this.env);
+      }
 
-//      this.env = new Environment(this.env);
       Environment new_env = new Environment(this.env);
 
       for (int i = 0; i < args.elements.length; i++) {
@@ -84,17 +85,18 @@ public class EnvValue {
       
       Interpreter interp = new Interpreter(new_env);
       EnvValue result = interp.eval_visit(this.body);
-
       
       return result;
     }
 
     public EnvValue eval(ArrayList<EnvValue> args) {
-      System.out.println("in closure.eval(2)");
-      System.out.println("  " + this.toString());
+      if (Parser.DEBUGGING) {
+        System.out.println("in closure.eval(2)");
+        System.out.println("  " + this.toString());
+        System.out.println("  closure.env= " + this.env);
+      }
+
       // error if args.length != arg_ids.length
-//      this.env = new Environment(this.env);
-      System.out.println(this.env);
       Environment new_env = new Environment(this.env);
 
       for (int i = 0; i < arg_ids.length; i++) {

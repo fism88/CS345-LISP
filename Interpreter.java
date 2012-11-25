@@ -32,8 +32,7 @@ public class Interpreter extends Visitor {
 
   public void visit(ASTNode node) {
     EnvValue result = this.eval_visit(node);
-    System.out.println(this.env);
-    System.out.println(result);
+    System.out.println("--> " + result);
   }
 
   public EnvValue eval_visit(ASTNode node) {
@@ -93,17 +92,20 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitAppNode(ASTNode node) {
-    System.out.println("Saw AppNode");
+    if (Parser.DEBUGGING) System.out.println("Saw AppNode");
 
     // function application: (f 1 2 ...)
     if (node.children.size() == 2) {
       String fun_id = node.children.get(0).value;
-      System.out.println(fun_id);
       EnvValue.Closure closure = (EnvValue.Closure) env.get(fun_id);
 
       EnvValue.List args = (EnvValue.List) this.eval_visit(node.children.get(1));
 
-      System.out.println("closure = " + closure);
+      if (Parser.DEBUGGING) {
+        System.out.println(" fun_id= " + fun_id);
+        System.out.println(" closure= " + closure);
+      }
+
       return closure.eval(args);
     }
     // represents let->lambda: app (a1 a2 ...) C (b1 b2 ...)
@@ -122,10 +124,9 @@ public class Interpreter extends Visitor {
         this.env.put(param_name, arg);
       }
       
-//      System.out.println(" len 3");
-//      System.out.println(" parameters: " + param_names.children);
-//      System.out.println(" arguments: " + Arrays.toString(args.elements));
-      System.out.println(" env: " + env);
+      if (Parser.DEBUGGING) {
+        System.out.println(" env: " + env);
+      }
 
       return this.eval_visit(node.children.get(1));
     }
@@ -133,7 +134,8 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitAppRecNode(ASTNode node) {
-    System.out.println("Saw AppRecNode");
+    if (Parser.DEBUGGING) System.out.println("Saw AppRecNode");
+
     ASTNode.ListNode param_names = (ASTNode.ListNode) node.children.get(0);
     ASTNode.ListNode args = (ASTNode.ListNode) node.children.get(2);
 
@@ -148,21 +150,25 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitIdNode(ASTNode node) {
-    System.out.println("Saw IdNode");
+    if (Parser.DEBUGGING) System.out.println("Saw IdNode");
 
     EnvValue sub = (EnvValue) this.env.get(node.value);
-    System.out.println(node.value + " gives " + sub + " from " + this.env);
+
+    if (Parser.DEBUGGING) {
+      System.out.println(node.value + " gives " + sub + " from " + this.env);
+    }
 
     return sub;
   }
 
   private EnvValue visitNumNode(ASTNode node) {
-    System.out.println("Saw NumNode");
+    if (Parser.DEBUGGING) System.out.println("Saw NumNode");
 
     return new EnvValue.Num(Double.parseDouble(node.value));
   }
 
   private EnvValue visitFunNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw FunNode");
     // need to create closure and return 
     ASTNode body = node.children.get(0);
     ASTNode list_node = node.children.get(1);
@@ -173,24 +179,16 @@ public class Interpreter extends Visitor {
       arg_ids.add(symbol.value);
     }
 
-//    Environment _env = new Environment(this.env); 
-
-//    System.out.println("Saw FunNode");
-//    System.out.println("  parameter " + arg_id);
-//    System.out.println("  body\n" + body);
-//    System.out.println("  this.env: " + this.env);
-//    System.out.println("  copied env: " + _env);
-
     EnvValue.Closure closure = new EnvValue.Closure(body, env, arg_ids);
     
     return closure;
   }
   private EnvValue visitSymbolNode(ASTNode node) {
-    System.out.println("Saw SymbolNode (error)");
+    if (Parser.DEBUGGING) System.out.println("Saw SymbolNode (error)");
     return null;
   }
   private EnvValue visitListNode(ASTNode node) {
-    System.out.println("Saw ListNode");
+    if (Parser.DEBUGGING) System.out.println("Saw ListNode");
 
     ArrayList values = new ArrayList<EnvValue>();
     for (ASTNode n: node.children) {
@@ -201,7 +199,8 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitAddNode(ASTNode node) {
-    System.out.println("Saw AddNode");
+    if (Parser.DEBUGGING) System.out.println("Saw AddNode");
+
     EnvValue.Num arg1 = (EnvValue.Num) this.eval_visit(node.children.get(0));
     EnvValue.Num arg2 = (EnvValue.Num) this.eval_visit(node.children.get(1));
 
@@ -210,7 +209,7 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitSubNode(ASTNode node) {
-    System.out.println("Saw SubNode");
+    if (Parser.DEBUGGING) System.out.println("Saw SubNode");
     EnvValue.Num arg1 = (EnvValue.Num) this.eval_visit(node.children.get(0));
     EnvValue.Num arg2 = (EnvValue.Num) this.eval_visit(node.children.get(1));
 
@@ -218,7 +217,7 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitMultNode(ASTNode node) {
-    System.out.println("Saw MultNode");
+    if (Parser.DEBUGGING) System.out.println("Saw MultNode");
     EnvValue.Num arg1 = (EnvValue.Num) this.eval_visit(node.children.get(0));
     EnvValue.Num arg2 = (EnvValue.Num) this.eval_visit(node.children.get(1));
 
@@ -226,7 +225,7 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitDivNode(ASTNode node) {
-    System.out.println("Saw DivNode");
+    if (Parser.DEBUGGING) System.out.println("Saw DivNode");
     EnvValue.Num arg1 = (EnvValue.Num) this.eval_visit(node.children.get(0));
     EnvValue.Num arg2 = (EnvValue.Num) this.eval_visit(node.children.get(1));
 
@@ -234,17 +233,17 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitCarNode(ASTNode node) {
-    System.out.println("Saw CarNode");
+    if (Parser.DEBUGGING) System.out.println("Saw CarNode");
     return this.eval_visit(node.execute());
   }
 
   private EnvValue visitCdrNode(ASTNode node) {
-    System.out.println("Saw CdrNode");
+    if (Parser.DEBUGGING) System.out.println("Saw CdrNode");
     return this.eval_visit(node.execute());
   }
   
   private EnvValue visitConsNode(ASTNode node) {
-    System.out.println("Saw ConsNode");
+    if (Parser.DEBUGGING) System.out.println("Saw ConsNode");
     return this.eval_visit(node.execute());
   }
 
@@ -254,7 +253,8 @@ public class Interpreter extends Visitor {
   }
 
   private EnvValue visitIfNode(ASTNode node) {
-    System.out.println("Saw IfNode");
+    if (Parser.DEBUGGING) System.out.println("Saw IfNode");
+
     EnvValue.Num arg1 = (EnvValue.Num) this.eval_visit(node.children.get(0));
 
     if (arg1.value == TRUE) {
@@ -268,7 +268,8 @@ public class Interpreter extends Visitor {
   }
   
   private EnvValue visitEqualsNode(ASTNode node) {
-    System.out.println("Saw EqualsNode");
+    if (Parser.DEBUGGING) System.out.println("Saw EqualsNode");
+
     EnvValue.Num arg1 = (EnvValue.Num) this.eval_visit(node.children.get(0));
     EnvValue.Num arg2 = (EnvValue.Num) this.eval_visit(node.children.get(1));
 

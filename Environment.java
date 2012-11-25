@@ -27,7 +27,6 @@ public class Environment {
 
   public Object get(String s) {
     Entry entry = environment.get(s);
-    System.out.println("in get(" + s + "): entry = " + entry);
     return entry.e2;
   }
 
