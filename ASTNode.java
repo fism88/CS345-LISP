@@ -18,6 +18,12 @@ public class ASTNode {
   static final String CONS = "cons";
   static final String IF = "if";
   static final String EQUALS = "equals";
+  static final String S_COMBINATOR = "s-comb";
+  static final String K_COMBINATOR = "k-comb";
+  static final String B_COMBINATOR = "b-comb";
+  static final String C_COMBINATOR = "c-comb";
+  static final String Y_COMBINATOR = "y-comb";
+  
 
   String type_str;
   String value;
@@ -219,6 +225,48 @@ public class ASTNode {
       super(ASTNode.DIV, null);
       this.AddChild(lhs);
       this.AddChild(rhs);
+    }
+  }
+
+  public static class SCombinatorNode extends ASTNode {
+    public SCombinatorNode(ASTNode f, ASTNode g, ASTNode x) {
+      super(ASTNode.S_COMBINATOR, null);
+      this.AddChild(f);
+      this.AddChild(g);
+      this.AddChild(x);
+    }
+  }
+  
+  public static class KCombinatorNode extends ASTNode {
+    public KCombinatorNode(ASTNode x, ASTNode y) {
+      super(ASTNode.K_COMBINATOR, null);
+      this.AddChild(x);
+      this.AddChild(y);
+    }
+  }
+
+  public static class BCombinatorNode extends ASTNode {
+    public BCombinatorNode(ASTNode f, ASTNode g, ASTNode x) {
+      super(ASTNode.B_COMBINATOR, null);
+      this.AddChild(f);
+      this.AddChild(g);
+      this.AddChild(x);
+    }
+  }
+
+  public static class CCombinatorNode extends ASTNode {
+    public CCombinatorNode(ASTNode f, ASTNode g, ASTNode x) {
+      super(ASTNode.C_COMBINATOR, null);
+      this.AddChild(f);
+      this.AddChild(g);
+      this.AddChild(x);
+    }
+  }
+
+  public static class YCombinatorNode extends ASTNode {
+    public YCombinatorNode(ASTNode f) {
+      super(ASTNode.Y_COMBINATOR, null);
+      this.AddChild(f);
     }
   }
 }

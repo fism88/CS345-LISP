@@ -27,6 +27,10 @@ public class Environment {
 
   public Object get(String s) {
     Entry entry = environment.get(s);
+    if (Parser.DEBUGGING) { 
+      System.out.println("looked up '" + s + "': ");
+      System.out.println("  entry is " + entry); 
+    }
     return entry.e2;
   }
 

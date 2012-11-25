@@ -84,12 +84,31 @@ public class Interpreter extends Visitor {
     else if (node instanceof ASTNode.EqualsNode) {
       return this.visitEqualsNode(node);
     }
- 
+    else if (node instanceof ASTNode.SCombinatorNode) {
+      return this.visitSCombinatorNode(node);
+    }
+    else if (node instanceof ASTNode.KCombinatorNode) {
+      return this.visitKCombinatorNode(node);
+    }
+    else if (node instanceof ASTNode.BCombinatorNode) {
+      return this.visitBCombinatorNode(node);
+    }
+    else if (node instanceof ASTNode.CCombinatorNode) {
+      return this.visitCCombinatorNode(node);
+    }
+    else if (node instanceof ASTNode.YCombinatorNode) {
+      return this.visitYCombinatorNode(node);
+    }
+    
+
     return null;
   }
 
   private EnvValue visitAppNode(ASTNode node) {
-    if (Parser.DEBUGGING) System.out.println("Saw AppNode");
+    if (Parser.DEBUGGING) {
+      System.out.println("Saw AppNode");
+      System.out.println(node);
+    }
 
     // function application: (f 1 2 ...)
     if (node.children.size() == 2) {
@@ -174,10 +193,12 @@ public class Interpreter extends Visitor {
     
     return closure;
   }
+
   private EnvValue visitSymbolNode(ASTNode node) {
     if (Parser.DEBUGGING) System.out.println("Saw SymbolNode (error)");
     return null;
   }
+
   private EnvValue visitListNode(ASTNode node) {
     if (Parser.DEBUGGING) System.out.println("Saw ListNode");
 
@@ -263,5 +284,88 @@ public class Interpreter extends Visitor {
       return new EnvValue.Num(TRUE);
     else
       return new EnvValue.Num(FALSE);
+  }
+
+  private EnvValue visitSCombinatorNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw SCombinatorNode");
+
+    // (s f g x) = (f x (g x))
+    EnvValue x = this.eval_visit(node.children.get(2));
+    EnvValue.Closure f = (EnvValue.Closure) this.eval_visit(node.children.get(0));
+    EnvValue.Closure g = (EnvValue.Closure) this.eval_visit(node.children.get(1));
+
+    ArrayList<EnvValue> gArgs = new ArrayList<EnvValue>();
+    ArrayList<EnvValue> fArgs = new ArrayList<EnvValue>();
+
+    gArgs.add(x);
+    
+    fArgs.add(x);
+    fArgs.add(g.eval(gArgs));
+
+    return f.eval(fArgs);
+  }
+
+  private EnvValue visitKCombinatorNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw KCombinatorNode");
+
+    return this.eval_visit(node.children.get(0));
+  }
+
+  private EnvValue visitBCombinatorNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw BCombinatorNode");
+
+    EnvValue x = this.eval_visit(node.children.get(2));
+    EnvValue.Closure f = (EnvValue.Closure) this.eval_visit(node.children.get(0));
+    EnvValue.Closure g = (EnvValue.Closure) this.eval_visit(node.children.get(1));
+
+    ArrayList<EnvValue> gArgs = new ArrayList<EnvValue>();
+    ArrayList<EnvValue> fArgs = new ArrayList<EnvValue>();
+
+    gArgs.add(x);
+
+    fArgs.add(g.eval(gArgs));
+
+    return f.eval(fArgs);
+  }
+
+  private EnvValue visitCCombinatorNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw CCombinatorNode");
+    
+    EnvValue x = this.eval_visit(node.children.get(2));
+    EnvValue.Closure f = (EnvValue.Closure) this.eval_visit(node.children.get(0));
+    EnvValue.Closure g = (EnvValue.Closure) this.eval_visit(node.children.get(1));
+
+    ArrayList<EnvValue> fArgs = new ArrayList<EnvValue>();
+    fArgs.add(x);
+    fArgs.add(g);
+
+    return f.eval(fArgs);
+  }
+
+  private EnvValue visitYCombinatorNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw YCombinatorNode");
+
+    // using (Y f) = (f (lambda (x) ((Y f) x)))
+    EnvValue.Closure f = (EnvValue.Closure) this.eval_visit(node.children.get(0));
+
+    ArrayList<EnvValue> fArgs = new ArrayList<EnvValue>();
+   
+    // make lambda body
+    ArrayList<ASTNode> arg_symbols = new ArrayList<ASTNode>();
+    arg_symbols.add(new ASTNode.IdNode("__x__"));
+    ASTNode body = new ASTNode.AppNode(node, arg_symbols);
+
+    // make lambda node
+    ArrayList<ASTNode> fun_params = new ArrayList<ASTNode>();
+    fun_params.add(new ASTNode.SymbolNode("__x__"));
+    ASTNode fun_node = new ASTNode.FunNode(body, fun_params);
+
+    // interpret lambda to get a closure
+    EnvValue.Closure result = (EnvValue.Closure) this.eval_visit(fun_node);    
+   
+    // evaluate the closure
+    ArrayList<EnvValue> args = new ArrayList<EnvValue>();
+    args.add(result);
+    return f.eval(args);
   }
 }

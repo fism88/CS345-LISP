@@ -77,6 +77,11 @@ TOKEN:
   | < SUB : "-" >
   | < MULT : "*" >
   | < DIV : "/" >
+  | < S_COMBINATOR : "S" >
+  | < K_COMBINATOR : "K" >
+  | < B_COMBINATOR : "B" >
+  | < C_COMBINATOR : "C" >
+  | < Y_COMBINATOR : "Y" >
   | < SYMBOL : ["a"-"z", "A"-"Z", "~", "`", "!", "@", "#", "$", "/", "^", "&",
                 "*", "_", "-", "=", "+", "{", "}", "[", "]", "|", "\\", ":",
                 ";", "<", ">", ",", ".", "?", "'", "\""](["a"-"z", "A"-"Z",
@@ -148,6 +153,68 @@ ASTNode mult():
   rhs = expr()
 
   { return new ASTNode.MultNode(lhs, rhs); }
+}
+
+ASTNode s_combinator():
+{
+  ASTNode f, g, x;
+}
+{
+  <S_COMBINATOR>
+  f = expr()
+  g = expr()
+  x = expr()
+
+  { return new ASTNode.SCombinatorNode(f, g, x); }
+}
+
+ASTNode k_combinator():
+{
+  ASTNode x, y;
+}
+{
+  <K_COMBINATOR>
+  x = expr()
+  y = expr()
+
+  { return new ASTNode.KCombinatorNode(x, y); }
+}
+
+ASTNode b_combinator():
+{
+  ASTNode f, g, x;
+}
+{
+  <B_COMBINATOR>
+  f = expr()
+  g = expr()
+  x = expr()
+
+  { return new ASTNode.BCombinatorNode(f, g, x); }
+}
+
+ASTNode c_combinator():
+{
+  ASTNode f, g, x;
+}
+{
+  <C_COMBINATOR>
+  f = expr()
+  g = expr()
+  x = expr()
+
+  { return new ASTNode.CCombinatorNode(f, g, x); }
+}
+
+ASTNode y_combinator():
+{
+  ASTNode f;
+}
+{
+  <Y_COMBINATOR>
+  f = expr()
+
+  { return new ASTNode.YCombinatorNode(f); }
 }
 
 ASTNode div():
@@ -351,6 +418,11 @@ ASTNode expr():
   | LOOKAHEAD(2) ( <LPAR> expr = sub() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = mult() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = div() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = s_combinator() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = k_combinator() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = b_combinator() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = c_combinator() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = y_combinator() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = function_app() <RPAR> ) { return expr; }
 
 }
