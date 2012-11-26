@@ -23,7 +23,11 @@ public class ASTNode {
   static final String B_COMBINATOR = "b-comb";
   static final String C_COMBINATOR = "c-comb";
   static final String Y_COMBINATOR = "y-comb";
-  
+  static final String PRLEN = "prlen"; 
+  static final String PRSUM = "prsum";
+  static final String PRPROD = "prprod";
+  static final String PRMAP = "prmap";
+  static final String EMPTY = "empty";
 
   String type_str;
   String value;
@@ -267,6 +271,42 @@ public class ASTNode {
     public YCombinatorNode(ASTNode f) {
       super(ASTNode.Y_COMBINATOR, null);
       this.AddChild(f);
+    }
+  }
+  
+  public static class EmptyNode extends ASTNode {
+    public EmptyNode(ASTNode list) {
+      super(ASTNode.EMPTY, null);
+      this.AddChild(list);
+    }
+  }
+
+  public static class PrlenNode extends ASTNode {
+    public PrlenNode(ASTNode list) {
+      super(ASTNode.PRLEN, null);
+      this.AddChild(list);
+    }
+  }
+
+  public static class PrsumNode extends ASTNode {
+    public PrsumNode(ASTNode list) {
+      super(ASTNode.PRSUM, null);
+      this.AddChild(list);
+    }
+  }
+
+  public static class PrprodNode extends ASTNode {
+    public PrprodNode(ASTNode list) {
+      super(ASTNode.PRPROD, null);
+      this.AddChild(list);
+    }
+  }
+
+  public static class PrmapNode extends ASTNode {
+    public PrmapNode(ASTNode f, ASTNode list) {
+      super(ASTNode.PRMAP, null);
+      this.AddChild(f);
+      this.AddChild(list);
     }
   }
 }

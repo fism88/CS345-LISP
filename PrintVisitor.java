@@ -5,6 +5,20 @@ public class PrintVisitor extends Visitor {
     this.visit(node, 0);
   }
 
+  public String stringVisit(ASTNode node) {
+    String result = "";
+
+    result += node.type_str;
+    if (node.value != null) {
+      result += " " + node.value;
+    }
+    
+    for (ASTNode child: node.children) {
+      result += " " + this.stringVisit(child).trim();
+    }
+    return "(" + result + ") ";
+  }
+
   private void visit(ASTNode node, int depth) {
     String result = "";
  
@@ -23,4 +37,6 @@ public class PrintVisitor extends Visitor {
       this.visit(child, depth + 1);
     }
   }
+
+  
 }

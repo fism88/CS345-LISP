@@ -99,6 +99,21 @@ public class Interpreter extends Visitor {
     else if (node instanceof ASTNode.YCombinatorNode) {
       return this.visitYCombinatorNode(node);
     }
+    else if (node instanceof ASTNode.EmptyNode) {
+      return this.visitEmptyNode(node);
+    }
+    else if (node instanceof ASTNode.PrlenNode) {
+      return this.visitPrlenNode(node);
+    }
+    else if (node instanceof ASTNode.PrsumNode) {
+      return this.visitPrsumNode(node);
+    }
+    else if (node instanceof ASTNode.PrprodNode) {
+      return this.visitPrprodNode(node);
+    }
+    else if (node instanceof ASTNode.PrmapNode) {
+      return this.visitPrmapNode(node);
+    }
     
 
     return null;
@@ -107,7 +122,6 @@ public class Interpreter extends Visitor {
   private EnvValue visitAppNode(ASTNode node) {
     if (Parser.DEBUGGING) {
       System.out.println("Saw AppNode");
-      System.out.println(node);
     }
 
     // function application: (f 1 2 ...)
@@ -150,12 +164,13 @@ public class Interpreter extends Visitor {
     ASTNode.ListNode args = (ASTNode.ListNode) node.children.get(2);
 
     // assume only one function in let-rec
-    String fun_name = param_names.children.get(0).value;
-    ASTNode fun_def = args.children.get(0);
-    
-    Environment new_env = CyclicBindAndInterpret(fun_name, fun_def, this.env);
+    for (int i = 0; i < param_names.children.size(); i++) {
+      String fun_name = param_names.children.get(i).value;
+      ASTNode fun_def = args.children.get(i);
+      Environment new_env = CyclicBindAndInterpret(fun_name, fun_def, this.env);
+      this.env = new Environment(new_env);
+    }
 
-    this.env = new Environment(new_env);
     return this.eval_visit(node.children.get(1));
   }
 
@@ -367,5 +382,33 @@ public class Interpreter extends Visitor {
     ArrayList<EnvValue> args = new ArrayList<EnvValue>();
     args.add(result);
     return f.eval(args);
+  }
+
+  private EnvValue visitEmptyNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw EmptyNode");
+   
+    EnvValue.List list = (EnvValue.List) this.eval_visit(node.children.get(0));
+
+    if (list.elements.length == 0)
+      return new EnvValue.Num(TRUE);
+    else
+      return new EnvValue.Num(FALSE);
+  }
+  private EnvValue visitPrlenNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw PrlenNode");
+
+    return null; 
+  }
+  private EnvValue visitPrsumNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw PrsumNode");
+    return null;
+  }
+  private EnvValue visitPrprodNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw PrprodNode");
+    return null;
+  }
+  private EnvValue visitPrmapNode(ASTNode node) {
+    if (Parser.DEBUGGING) System.out.println("Saw PrmapNode");
+    return null;
   }
 }

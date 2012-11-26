@@ -5,10 +5,6 @@
 (let ((f (lambda (x) (+ 1 x))) (g (lambda (x) (* x x)))) (B f g 2))
 (let ((f (lambda (x g) (g x)))) (C f (lambda (x) (* x x)) 2))
 (let ((f (lambda (x g) (* x (g x))))) (C f (lambda (x) (* x x)) 2))
-(let (
-  (y (lambda (f) ((lambda (x) (f (lambda (v) ((x x) v)))) (lambda (x) (f (lambda (v) ((x x) v)))))))
-  (fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1))))))))
-  ((y fact) 5))
 (let-rec ((y (lambda (f) (f (lambda (x) ((y f) x))))))
   (let  ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1))))))))
   ((y fact) 5)))
@@ -17,3 +13,7 @@
 (let ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1)))))))) ((Y fact) 2))
 (let ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1)))))))) ((Y fact) 5))
 (let ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1)))))))) ((Y fact) 100))
+(let (
+  (y (lambda (f) ((lambda (x) (f (lambda (v) ((x x) v)))) (lambda (x) (f (lambda (v) ((x x) v)))))))
+  (fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1))))))))
+  ((y fact) 5))

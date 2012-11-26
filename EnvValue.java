@@ -66,7 +66,10 @@ public class EnvValue {
     public Closure(ASTNode body, Environment env, ArrayList<String> arg_ids) {
       super(EnvValue.CLOSUREV);
       this.body = body;
-      this.env = new Environment(env);
+      if (Parser.SCOPING.equals(Parser.STATIC_SCOPE))
+        this.env = new Environment(env);
+      else
+        this.env = env;
       this.arg_ids = arg_ids.toArray(new String[0]);
     }
     
@@ -90,28 +93,27 @@ public class EnvValue {
     }
 
     public EnvValue eval(ArrayList<EnvValue> args) {
-      if (Parser.DEBUGGING) {
-        System.out.println("in closure.eval(2)");
-        System.out.println("  " + this.toString());
-        System.out.println("  closure.env= " + this.env);
-      }
-
-      // error if args.length != arg_ids.length
-      Environment new_env = new Environment(this.env);
-
-      for (int i = 0; i < arg_ids.length; i++) {
-        new_env.put(this.arg_ids[i], args.get(i));
-      }
-      Interpreter interp = new Interpreter(new_env);
-      EnvValue result = interp.eval_visit(this.body);
-      
-      return result;
+      EnvValue.List tmp = new EnvValue.List(args);
+      return this.eval(tmp);
     }
 
     public String toString() {
+      PrintVisitor pv = new PrintVisitor();
+
       String result = "(" + this.type_name + " " + Arrays.toString(this.arg_ids) + " ";
-      result += "(" + this.body.toString().replaceAll("\n", " ").trim() + ") ";
+
+      result += pv.stringVisit(this.body);
       result += this.env.toString() + ")";
+      return result;
+    }
+
+    public String toStringNoEnvironment() {
+      PrintVisitor pv = new PrintVisitor();
+
+      String result = "(" + this.type_name + " " + Arrays.toString(this.arg_ids) + " ";
+
+      result += pv.stringVisit(this.body);
+      result += "(...)) ";
       return result;
     }
   }

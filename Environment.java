@@ -50,14 +50,18 @@ public class Environment {
       depth += 1;
       Entry entry = environment.get(s);
       if (entry.e1 == this.NOT_REC_SUB) {
-        result = "(aSub " + s + " " + entry.e2.toString() + " " + result; 
+        if (entry.e2 instanceof EnvValue.Closure) {
+          EnvValue.Closure val = (EnvValue.Closure) entry.e2;
+          result = "(aSub " + s + " " + 
+            val.toStringNoEnvironment() + result;
+        }
+        else {
+          result = "(aSub " + s + " " + entry.e2.toString() + " " + result; 
+        }
       }
       else if (entry.e1 == this.IS_REC_SUB) {
         EnvValue.Closure tmp = (EnvValue.Closure) entry.e2;
-        result = 
-          "(aRecSub " + s + " (closureV " + Arrays.toString(tmp.arg_ids) + 
-          " (" + tmp.body.toString().replaceAll("\n", " ").trim() + ") " +
-          "(...))" + result;
+        result = "(aRecSub " + s + " " + tmp.toStringNoEnvironment() + "(...)) " + result;
       }
     }
      

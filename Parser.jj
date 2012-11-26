@@ -7,8 +7,15 @@ import java.util.LinkedHashMap;
 
 public class Parser {
   
+  public static final String DYNAMIC_SCOPE = "dynamic";
+  public static final String STATIC_SCOPE = "static";
+
   public static boolean DEBUGGING = false;
+  public static boolean SHOW_AST = false;
+  public static String SCOPING = STATIC_SCOPE;
   public static final String[] DEBUG_FLAGS = {"-d", "--debug"};
+  public static final String[] SHOW_AST_FLAGS = {"-a", "--ast"};
+  public static final String[] SCOPING_FLAGS = {"--dynamic"};
 
   static class Pair<A, B> {
     final A v1;
@@ -25,13 +32,23 @@ public class Parser {
   }
 
   private static void parseFlags(String[] args) {
-    System.out.println(Arrays.toString(args));
     for (int i = 0; i < args.length; i++) {
       for (String flag: DEBUG_FLAGS) {
         if (args[i].equals(flag))
           DEBUGGING = true;
       }   
+      for (String flag: SHOW_AST_FLAGS) {
+        if (args[i].equals(flag))
+          SHOW_AST = true;
+      }
+      for (String flag: SCOPING_FLAGS) {
+        if (args[i].equals(flag)) {
+          SCOPING = DYNAMIC_SCOPE;
+        }
+      }
     }
+
+    System.out.println("Scoping= " + SCOPING);
   }
 
   public static void main(String args[]) throws ParseException {
@@ -82,6 +99,11 @@ TOKEN:
   | < B_COMBINATOR : "B" >
   | < C_COMBINATOR : "C" >
   | < Y_COMBINATOR : "Y" >
+  | < PRLEN : "prlen" >
+  | < PRSUM : "prsum" >
+  | < PRPROD : "prprod" >
+  | < PRMAP : "prmap" >
+  | < EMPTY : "empty" >
   | < SYMBOL : ["a"-"z", "A"-"Z", "~", "`", "!", "@", "#", "$", "/", "^", "&",
                 "*", "_", "-", "=", "+", "{", "}", "[", "]", "|", "\\", ":",
                 ";", "<", ">", ",", ".", "?", "'", "\""](["a"-"z", "A"-"Z",
@@ -215,6 +237,62 @@ ASTNode y_combinator():
   f = expr()
 
   { return new ASTNode.YCombinatorNode(f); }
+}
+
+ASTNode prlen():
+{
+  ASTNode x;
+}
+{
+  <PRLEN>
+  x = expr()
+
+  { return new ASTNode.PrlenNode(x); }
+}
+
+ASTNode prsum():
+{
+  ASTNode x;
+}
+{
+  <PRSUM>
+  x = expr()
+
+  { return new ASTNode.PrsumNode(x); }
+}
+
+ASTNode prprod():
+{
+  ASTNode x;
+}
+{
+  <PRPROD>
+  x = expr()
+
+  { return new ASTNode.PrprodNode(x); }
+}
+
+ASTNode prmap():
+{
+  ASTNode f, x;
+}
+{
+  <PRMAP>
+  f = expr()
+  x = expr()
+
+  { return new ASTNode.PrmapNode(f, x); }
+}
+
+ASTNode empty():
+{
+  ASTNode x;
+}
+{
+  <EMPTY>
+  x = expr()
+
+  { return new ASTNode.EmptyNode(x); }
 }
 
 ASTNode div():
@@ -423,6 +501,11 @@ ASTNode expr():
   | LOOKAHEAD(2) ( <LPAR> expr = b_combinator() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = c_combinator() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = y_combinator() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = empty() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = prlen() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = prsum() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = prprod() <RPAR> ) { return expr; }
+  | LOOKAHEAD(2) ( <LPAR> expr = prmap() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = function_app() <RPAR> ) { return expr; }
 
 }
@@ -438,7 +521,8 @@ void prog():
     s = expr() 
     {  
       System.out.println("-------------------------------");
-      s.accept(v);
+      if (Parser.SHOW_AST)
+        s.accept(v);
 
       interp = new Interpreter();
 
