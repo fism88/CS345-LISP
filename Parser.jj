@@ -55,7 +55,7 @@ public class Parser {
   public static void main(String args[]) throws ParseException {
     parseFlags(args);
 
-    Parser parser = new Parser (System.in);
+    Parser parser = new Parser(System.in);
     parser.prog();
   }
 }
@@ -238,51 +238,6 @@ ASTNode y_combinator():
   f = expr()
 
   { return new ASTNode.YCombinatorNode(f); }
-}
-
-ASTNode prlen():
-{
-  ASTNode x;
-}
-{
-  <PRLEN>
-  x = expr()
-
-  { return new ASTNode.PrlenNode(x); }
-}
-
-ASTNode prsum():
-{
-  ASTNode x;
-}
-{
-  <PRSUM>
-  x = expr()
-
-  { return new ASTNode.PrsumNode(x); }
-}
-
-ASTNode prprod():
-{
-  ASTNode x;
-}
-{
-  <PRPROD>
-  x = expr()
-
-  { return new ASTNode.PrprodNode(x); }
-}
-
-ASTNode prmap():
-{
-  ASTNode f, x;
-}
-{
-  <PRMAP>
-  f = expr()
-  x = expr()
-
-  { return new ASTNode.PrmapNode(f, x); }
 }
 
 ASTNode empty():
@@ -502,31 +457,29 @@ ASTNode expr():
   | LOOKAHEAD(2) ( <LPAR> expr = c_combinator() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = y_combinator() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = empty() <RPAR> ) { return expr; }
-  | LOOKAHEAD(2) ( <LPAR> expr = prlen() <RPAR> ) { return expr; }
-  | LOOKAHEAD(2) ( <LPAR> expr = prsum() <RPAR> ) { return expr; }
-  | LOOKAHEAD(2) ( <LPAR> expr = prprod() <RPAR> ) { return expr; }
-  | LOOKAHEAD(2) ( <LPAR> expr = prmap() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = function_app() <RPAR> ) { return expr; }
 }
 
 void prog():
 {
   ASTNode s;
-  PrintVisitor v = new PrintVisitor();
+  PrintVisitor printer = new PrintVisitor();
   Interpreter interp;
 }
 {
   (
     s = expr()
     {
-      System.out.println("-------------------------------");
-      if (Parser.SHOW_AST)
-        s.accept(v);
+      if (Parser.SHOW_AST) {
+        System.out.println("-------------------------------");
+        s.accept(printer);
+      }
 
       interp = new Interpreter();
 
       s.accept(interp);
       System.out.println(interp.env);
+      System.out.println();
     }
   )*
 }

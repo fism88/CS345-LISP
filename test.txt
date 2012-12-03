@@ -12,12 +12,12 @@
 ((lambda (x) (* x x)) 2)
 ((lambda (f) (f 3)) (lambda (x) (* x x)))
 (let ((f (lambda (x y) (+ x y)))) (f 2 3))
-(let-rec
+(letrec
   ((f (lambda (x) (if (= x 0) 1 (f (- x 1)))))
    (g (lambda (x) (if (= x 0) 2 (g (- x 1)))))
    (h (lambda (x) (if (= x 0) 3 (h (- x 1))))))
   (f (g (h 20))))
-(let-rec
+(letrec
   ((f (lambda (x) (if (= x 0) 1 (f (- x 1)))))
    (g (lambda (x) (if (= x 0) 2 (f (- x 1)))))
    (h (lambda (x) (if (= x 0) 3 (f (- x 1))))))

@@ -1,5 +1,5 @@
 
-public class PrintVisitor extends Visitor {
+public class PrintVisitor implements Visitor {
 
   public void visit(ASTNode node) {
     this.visit(node, 0);

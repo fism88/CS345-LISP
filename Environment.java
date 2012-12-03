@@ -50,8 +50,8 @@ public class Environment {
       depth += 1;
       Entry entry = environment.get(s);
       if (entry.e1 == this.NOT_REC_SUB) {
-        if (entry.e2 instanceof EnvValue.Closure) {
-          EnvValue.Closure val = (EnvValue.Closure) entry.e2;
+        if (entry.e2 instanceof EnvironmentValue.Closure) {
+          EnvironmentValue.Closure val = (EnvironmentValue.Closure) entry.e2;
           result = "(aSub " + s + " " + 
             val.toStringNoEnvironment() + result;
         }
@@ -59,8 +59,11 @@ public class Environment {
           result = "(aSub " + s + " " + entry.e2.toString() + " " + result; 
         }
       }
+      // recursive function definitions create cyclic environments
+      // (environment contains a closure which contains the environment)
+      // so haveto be careful printing it out
       else if (entry.e1 == this.IS_REC_SUB) {
-        EnvValue.Closure tmp = (EnvValue.Closure) entry.e2;
+        EnvironmentValue.Closure tmp = (EnvironmentValue.Closure) entry.e2;
         result = "(aRecSub " + s + " " + tmp.toStringNoEnvironment() + "(...)) " + result;
       }
     }

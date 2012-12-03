@@ -5,7 +5,7 @@ public class ASTNode {
   static final String NUM = "num";
   static final String ID  = "id";
   static final String APP = "app";
-  static final String APPREC = "app-rec";
+  static final String APPREC = "apprec";
   static final String FUN = "fun";
   static final String SYMBOL = "'";
   static final String LIST = "list";
@@ -78,7 +78,14 @@ public class ASTNode {
     return result;
   }
 
+  /**
+   * We define a class for each different ASTNode
+   */
 
+  /** 
+   * The symbol node is distinguished from the IdNode in that we 
+   * never use a SymbolNode to lookup a value in the environment
+   */
   public static class SymbolNode extends ASTNode {
     public SymbolNode(String symbol) {
       super(ASTNode.SYMBOL, symbol);
@@ -90,6 +97,7 @@ public class ASTNode {
       super(ASTNode.ID, id);
     }
   }
+
   public static class NumNode extends ASTNode {
     public NumNode(String num) {
       super(ASTNode.NUM, num);
@@ -142,26 +150,12 @@ public class ASTNode {
       super(ASTNode.CAR, null);
       this.children.add(list);
     }
-
-    public ASTNode execute() {
-      ASTNode list = this.children.get(0);
-      return list.children.get(0);
-    }
   }
 
   public static class CdrNode extends ASTNode {
     public CdrNode(ASTNode list) {
       super(ASTNode.CDR, null);
       this.children.add(list);
-    }
-
-    public ASTNode execute() {
-      ASTNode list = this.children.get(0);
-      ArrayList<ASTNode> result = new ArrayList<ASTNode>();
-      for (int i = 1; i < list.children.size(); i++) {
-        result.add(list.children.get(i));
-      }
-      return new ASTNode.ListNode(result);
     }
   }
 
@@ -170,16 +164,6 @@ public class ASTNode {
       super(ASTNode.CONS, null);
       this.children.add(arg);
       this.children.add(list);
-    }
-
-    public ASTNode execute() {
-      ArrayList<ASTNode> result = new ArrayList<ASTNode>();
-      result.add(this.children.get(0));
-      for (ASTNode n: this.children.get(1).children) {
-        result.add(n);
-      }
-
-      return new ASTNode.ListNode(result);
     }
   }
 
@@ -277,35 +261,6 @@ public class ASTNode {
   public static class EmptyNode extends ASTNode {
     public EmptyNode(ASTNode list) {
       super(ASTNode.EMPTY, null);
-      this.AddChild(list);
-    }
-  }
-
-  public static class PrlenNode extends ASTNode {
-    public PrlenNode(ASTNode list) {
-      super(ASTNode.PRLEN, null);
-      this.AddChild(list);
-    }
-  }
-
-  public static class PrsumNode extends ASTNode {
-    public PrsumNode(ASTNode list) {
-      super(ASTNode.PRSUM, null);
-      this.AddChild(list);
-    }
-  }
-
-  public static class PrprodNode extends ASTNode {
-    public PrprodNode(ASTNode list) {
-      super(ASTNode.PRPROD, null);
-      this.AddChild(list);
-    }
-  }
-
-  public static class PrmapNode extends ASTNode {
-    public PrmapNode(ASTNode f, ASTNode list) {
-      super(ASTNode.PRMAP, null);
-      this.AddChild(f);
       this.AddChild(list);
     }
   }
