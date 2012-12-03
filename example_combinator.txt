@@ -1,0 +1,5 @@
+(let ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1)))))))) ((Y fact) 0))
+(let ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1)))))))) ((Y fact) 1))
+(let ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1)))))))) ((Y fact) 2))
+(let ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1)))))))) ((Y fact) 5))
+(let ((fact (lambda (f) (lambda (n) (if (= n 0) 1 (* n (f (- n 1)))))))) ((Y fact) 100))
