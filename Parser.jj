@@ -13,10 +13,11 @@ public class Parser {
   public static boolean DEBUGGING = false;
   public static boolean SHOW_AST = false;
   public static String SCOPING = STATIC_SCOPE;
-  public static final String[] DEBUG_FLAGS = {"-d", "--debug"};
+  public static final String[] DEBUG_FLAGS = {"--debug"};
   public static final String[] SHOW_AST_FLAGS = {"-a", "--ast"};
-  public static final String[] SCOPING_FLAGS = {"--dynamic"};
+  public static final String[] SCOPING_FLAGS = {"-d", "--dynamic"};
 
+  // Pair class used in handling multiple binding instances
   static class Pair<A, B> {
     final A v1;
     final B v2;
@@ -48,7 +49,7 @@ public class Parser {
       }
     }
 
-    System.out.println("Scoping= " + SCOPING);
+    System.out.println("Scoping = " + SCOPING);
   }
 
   public static void main(String args[]) throws ParseException {
@@ -82,7 +83,7 @@ TOKEN:
   | < INTEGER : (["0"-"9"])+ | "-" (["0"-"9"])+ >
   | < DOUBLE : (["0"-"9"])+"."(["0"-"9"])+ | "-" (["0"-"9"])+"."(["0"-"9"])+ >
   | < LET : "let">
-  | < LETREC : "let-rec" >
+  | < LETREC : "letrec" >
   | < LAMBDA : "lambda" >
   | < LIST : "list" >
   | < CAR : "car" >
@@ -403,7 +404,6 @@ ASTNode conditional():
   { return new ASTNode.IfNode(conditional, exprOne, exprTwo); }
 }
 
-
 ArrayList let_binding_instances():
 { 
   ArrayList map = new ArrayList<Pair>();
@@ -507,7 +507,6 @@ ASTNode expr():
   | LOOKAHEAD(2) ( <LPAR> expr = prprod() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = prmap() <RPAR> ) { return expr; }
   | LOOKAHEAD(2) ( <LPAR> expr = function_app() <RPAR> ) { return expr; }
-
 }
 
 void prog():
@@ -518,8 +517,8 @@ void prog():
 }
 {
   (
-    s = expr() 
-    {  
+    s = expr()
+    {
       System.out.println("-------------------------------");
       if (Parser.SHOW_AST)
         s.accept(v);
@@ -528,7 +527,6 @@ void prog():
 
       s.accept(interp);
       System.out.println(interp.env);
-
-    } 
+    }
   )*
 }
