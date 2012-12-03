@@ -1,7 +1,7 @@
 [X] Add subract function
 [X] Add multiplication function
 [X] Add divide function
-[ ] Add function to test if a list is empty
+[x] Add function to test if a list is empty
 [wtf] list combinators
 [ ] foldr with list combinators
 [x] whole number combinators preloaded like car/cdr/cons

@@ -1,0 +1,35 @@
+Faraaz Ismail
+Brett Smith
+Paul Glass
+
+Project: Full Lisp interpreter
+
+Parser.jj
+-- Create an abstract syntax tree
+-- Converts lets to lambdas applications
+ASTNode.java
+-- The abstract syntax tree
+-- Visitable
+Visitor.java
+-- subclass PrintVisitor prints out the AST
+-- subclass Interpreter inteprets the AST
+Interpreter.java
+-- Visits the AST
+-- Constructs an Environment as it goes
+-- Evaluates closures
+Environment.java
+-- A LinkedHashMap, useful for printing
+-- Map Strings to EnvValue objects
+EnvValue.java
+-- Num class
+-- List class
+-- Closure class
+
+Features
+-- Recursion
+  -- "let-rec"
+  -- Create a cyclic environment
+-- Lists with car, cdr, cons
+-- Static or dynamic scoping
+-- Whole number combinators
+  -- Y combinator: another way to do recursion
